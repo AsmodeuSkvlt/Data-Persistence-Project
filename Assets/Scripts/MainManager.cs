@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
+using System.Runtime.CompilerServices;
 
 public class MainManager : MonoBehaviour
 {
@@ -10,12 +12,13 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
-    public Text ScoreText;
+    public TextMeshProUGUI scoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
-    
+
+    private Transform brickContainer;
     private bool m_GameOver = false;
 
     
@@ -31,10 +34,10 @@ public class MainManager : MonoBehaviour
             for (int x = 0; x < perLine; ++x)
             {
                 Vector3 position = new Vector3(-1.5f + step * x, 2.5f + i * 0.3f, 0);
-                var brick = Instantiate(BrickPrefab, position, Quaternion.identity);
+                var brick = Instantiate(BrickPrefab, position, Quaternion.identity, brickContainer);
                 brick.PointValue = pointCountArray[i];
                 brick.onDestroyed.AddListener(AddPoint);
-            }
+            }          
         }
     }
 
@@ -52,7 +55,13 @@ public class MainManager : MonoBehaviour
                 Ball.transform.SetParent(null);
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
             }
+           
+            
         }
+        if (brickContainer.childCount == 0)
+                {
+                    GameOver();
+                }
         else if (m_GameOver)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -65,7 +74,7 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        scoreText.SetText($"Score : {m_Points}");
     }
 
     public void GameOver()
